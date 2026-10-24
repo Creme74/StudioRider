@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/images/nagra.png" width="360" alt="Nagra IV-S tape recorder">
+</p>
+
 # StudioWire
 
 An AU / VST3 plugin that lets someone listen to your DAW's output in a web
@@ -26,7 +30,9 @@ DAW (master) ─► StudioWire ─► local server 127.0.0.1 ─► cloudflared 
 
 ## Installing
 
-Get `StudioWire-<version>.pkg` and open it. It installs, for all users:
+Download **[StudioWire-0.6.1.pkg](https://github.com/Creme74/StudioWire/releases/download/v0.6.1/StudioWire-0.6.1.pkg)**
+(or the latest version from the **[Releases](https://github.com/Creme74/StudioWire/releases/latest)** page)
+and open it. It installs, for all users:
 
 | What | Where |
 |---|---|
@@ -181,7 +187,7 @@ version. It is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; see [LICENSE](LICENSE).
 
 If you give the installer to someone, the GPL asks that they can get the
-matching source code too: hand out the `-source.tar.gz` that `package.sh` makes
-along with it, or point them to a public copy of this repository.
+matching source code too: point them to this repository, or hand out the
+`-source.tar.gz` that `package.sh` makes along with it.
 
 Third-party software and licences: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
