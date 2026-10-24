@@ -11,9 +11,9 @@ DAW (master) ─► StudioWire ─► local server 127.0.0.1 ─► cloudflared 
 ```
 
 <p align="center">
-  <img src="docs/images/plugin.png" width="440" alt="The StudioWire plugin window: Start sharing, stream quality, link to send to the listener">
+  <img src="docs/images/plugin.png" width="57%" alt="The StudioWire plugin window: Start sharing, stream quality, link to send to the listener">
   &nbsp;
-  <img src="docs/images/listener.png" width="280" alt="The listening page in a browser: playing in CD quality, level meters, quality and buffer settings">
+  <img src="docs/images/listener.png" width="36%" alt="The listening page in a browser: playing in CD quality, level meters, quality and buffer settings">
 </p>
 
 - macOS 13 Ventura or later, Apple Silicon and Intel. (The plugin itself could
