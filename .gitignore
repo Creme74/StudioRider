@@ -1,0 +1,13 @@
+# Build output
+build/
+build-*/
+*.pkg
+
+# Downloaded by build.sh / package.sh (pinned versions, see scripts/common.sh)
+JUCE/
+third_party/
+.tools/
+
+# macOS
+.DS_Store
+._*

@@ -1,0 +1,15 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 The StudioWire authors
+#
+# Runs as root before the files are copied: removes the previous version, so that
+# no stale file stays behind (inside the plugin bundles or in the support folder).
+for p in "/Library/Audio/Plug-Ins/Components/StudioWire.component" \
+         "/Library/Audio/Plug-Ins/VST3/StudioWire.vst3" \
+         "/Library/Audio/Plug-Ins/Components/MixShare.component" \
+         "/Library/Audio/Plug-Ins/VST3/MixShare.vst3" \
+         "/Library/Application Support/StudioWire" \
+         "/Applications/StudioWire"; do
+    [[ -e "$p" ]] && rm -rf "$p"
+done
+exit 0

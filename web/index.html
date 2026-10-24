@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 The StudioWire authors -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>StudioWire · Listen</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="card">
+  <header class="top">
+    <span class="brand">StudioWire</span>
+    <span id="state" class="pill wait">Connecting…</span>
+  </header>
+
+  <h1>Listen live</h1>
+  <p id="format" class="format">Loading stream info…</p>
+
+  <div id="notice" class="notice" role="status" aria-live="polite" hidden>
+    <strong id="noticeTitle"></strong>
+    <span id="noticeText"></span>
+  </div>
+
+  <button id="play" class="play" type="button" disabled>
+    <span class="play-icon" aria-hidden="true"></span>
+    <span id="playLabel">Listen</span>
+  </button>
+
+  <div class="meters" aria-hidden="true">
+    <div class="meter"><span>L</span><div class="bar"><div id="meterL" class="fill"></div></div></div>
+    <div class="meter"><span>R</span><div class="bar"><div id="meterR" class="fill"></div></div></div>
+  </div>
+
+  <div class="controls">
+    <label class="ctl wide">
+      <span>Quality</span>
+      <select id="quality">
+        <option value="cd" selected>CD · FLAC 16-bit</option>
+      </select>
+    </label>
+    <label class="ctl">
+      <span>Volume <output id="volOut">100%</output></span>
+      <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+    </label>
+    <label class="ctl">
+      <span>Buffer</span>
+      <select id="latency">
+        <option value="0.25">0.25 s</option>
+        <option value="0.5" selected>0.5 s</option>
+        <option value="1">1 s</option>
+        <option value="2">2 s</option>
+      </select>
+    </label>
+  </div>
+
+  <dl class="stats">
+    <div><dt>Buffer</dt><dd id="sBuf">—</dd></div>
+    <div><dt>Bitrate</dt><dd id="sRate">—</dd></div>
+    <div><dt>Network dropouts</dt><dd id="sUnder">0</dd></div>
+    <div><dt>Listeners</dt><dd id="sListeners">—</dd></div>
+  </dl>
+
+  <p class="note">The studio sets the maximum quality; you can pick a lower one if your connection is slow. In CD and Hi-Res the sound arrives lossless: at 100% volume, it is exactly what the studio is playing.</p>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

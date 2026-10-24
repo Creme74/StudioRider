@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- Copyright (C) 2026 The StudioWire authors -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root { color-scheme: light dark; }
+  body { font: 13px -apple-system, "Helvetica Neue", sans-serif; line-height: 1.45; margin: 0 4px; color: #1d1d1f; }
+  h1 { font-size: 17px; margin: 0 0 8px; }
+  code { font: 12px Menlo, monospace; }
+  .small { color: #6e6e73; font-size: 12px; }
+  @media (prefers-color-scheme: dark) { body { color: #f2f2f7; } .small { color: #a1a1a6; } }
+</style>
+</head>
+<body>
+<h1>StudioWire @VERSION@</h1>
+<p>Lets someone listen to what your DAW plays, in a web browser: lossless FLAC, or
+Opus for slow connections. Free, no server to rent.</p>
+<p>This installs, for all users of this Mac:</p>
+<ul>
+  <li>the <b>Audio Unit</b> and <b>VST3</b> plugins, for Apple Silicon and Intel Macs;</li>
+  <li><b>cloudflared @CLOUDFLARED@</b> (Cloudflare), which creates the public link.
+      The plugin can update it later (<i>Check for update</i> at the bottom of its window).</li>
+</ul>
+<p>An uninstaller is put in <b>Applications &gt; StudioWire</b>.</p>
+<p class="small">Copies of StudioWire (or of its former name, MixShare) in your own
+<code>~/Library/Audio/Plug-Ins</code> folder are replaced by this one.</p>
+<p class="small">StudioWire is free software under the GNU General Public License,
+version 3 or later. It comes with no warranty. Licences of StudioWire and of the
+software it includes are in <code>/Library/Application Support/StudioWire/Licenses</code>.</p>
+</body>
+</html>
