@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/nagra.png" width="360" alt="Nagra IV-S tape recorder">
+  <img src="docs/images/logo.png" width="200" alt="StudioRider logo: a rider on a moped">
 </p>
 
 # StudioRider
@@ -30,9 +30,8 @@ DAW (master) ─► StudioRider ─► local server 127.0.0.1 ─► cloudflared
 
 ## Installing
 
-Download **[StudioRider-0.6.2.pkg](https://github.com/Creme74/StudioRider/releases/download/v0.6.2/StudioRider-0.6.2.pkg)**
-(or the latest version from the **[Releases](https://github.com/Creme74/StudioRider/releases/latest)** page)
-and open it. It installs, for all users:
+Download the latest `StudioRider-<version>.pkg` from the
+**[Releases](https://github.com/Creme74/StudioRider/releases/latest)** page and open it. It installs, for all users:
 
 | What | Where |
 |---|---|
