@@ -3,7 +3,7 @@
 <!-- Copyright (C) 2026 The StudioRider authors -->
 <!-- Template: package.sh fills in the @…@ values. -->
 <installer-gui-script minSpecVersion="2">
-    <title>StudioRider @VERSION@</title>
+    <title>StudioRider @SHOWN@</title>
     <welcome file="welcome.html" mime-type="text/html"/>
     <conclusion file="conclusion.html" mime-type="text/html"/>
     <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>

@@ -16,6 +16,11 @@ MIN_MACOS="13.0"
 say() { printf "\n\033[1;38;5;208m==>\033[0m \033[1m%s\033[0m\n" "$*"; }
 die() { printf "\n\033[1;31mError:\033[0m %s\n" "$*" >&2; exit 1; }
 
+# The version as shown to people: 1.0 rather than 1.0.0 (patch number only when it isn't 0).
+studiorider_shown_version() {
+    studiorider_version | sed 's/^\([0-9]*\.[0-9]*\)\.0$/\1/'
+}
+
 studiorider_version() {
     sed -n 's/^project(StudioRider VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt
 }

@@ -21,7 +21,8 @@ source scripts/common.sh
 
 ARCHS="arm64;x86_64"
 PKG_ID="net.studiorider.pkg"
-VERSION="$(studiorider_version)"
+VERSION="$(studiorider_version)"         # 1.0.0: for macOS (package and bundle versions)
+SHOWN="$(studiorider_shown_version)"     # 1.0: in names and titles
 [[ -n "$VERSION" ]] || die "Could not read the version from CMakeLists.txt."
 
 check_tools
@@ -192,14 +193,14 @@ pkgbuild --root "$ROOT" \
          --install-location / \
          build/pkgparts/StudioRider.pkg >/dev/null
 
-sed -e "s/@VERSION@/$VERSION/g" -e "s/@MIN_MACOS@/$MIN_MACOS/g" -e "s/@PKG_ID@/$PKG_ID/g" \
+sed -e "s/@VERSION@/$VERSION/g" -e "s/@SHOWN@/$SHOWN/g" -e "s/@MIN_MACOS@/$MIN_MACOS/g" -e "s/@PKG_ID@/$PKG_ID/g" \
     packaging/Distribution.xml > build/pkgparts/Distribution.xml
 mkdir -p build/pkgparts/resources
 for f in packaging/resources/*.html; do
-    sed -e "s/@VERSION@/$VERSION/g" -e "s/@CLOUDFLARED@/$CF_VERSION/g" "$f" > "build/pkgparts/resources/$(basename "$f")"
+    sed -e "s/@VERSION@/$SHOWN/g" -e "s/@CLOUDFLARED@/$CF_VERSION/g" "$f" > "build/pkgparts/resources/$(basename "$f")"
 done
 
-PKG="build/StudioRider-$VERSION.pkg"
+PKG="build/StudioRider-$SHOWN.pkg"
 rm -f "$PKG"
 if [[ -n "${SIGN_INSTALLER:-}" ]]; then
     productbuild --distribution build/pkgparts/Distribution.xml --resources build/pkgparts/resources \
@@ -215,11 +216,11 @@ if [[ -n "${NOTARY_PROFILE:-}" ]]; then
 fi
 
 # --- 5. Matching source code -----------------------------------------------------
-SRC="build/StudioRider-$VERSION-source.tar.gz"
+SRC="build/StudioRider-$SHOWN-source.tar.gz"
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1 && [[ -z "$(git status --porcelain 2>/dev/null)" ]]; then
-    git archive --format=tar.gz --prefix="StudioRider-$VERSION/" -o "$SRC" HEAD
+    git archive --format=tar.gz --prefix="StudioRider-$SHOWN/" -o "$SRC" HEAD
 else
-    COPYFILE_DISABLE=1 tar -czf "$SRC" -s ",^\.,StudioRider-$VERSION," \
+    COPYFILE_DISABLE=1 tar -czf "$SRC" -s ",^\.,StudioRider-$SHOWN," \
         --exclude ./build --exclude './build-*' --exclude ./JUCE --exclude ./third_party \
         --exclude ./.tools --exclude ./.git --exclude .DS_Store --exclude '*.pkg' .
 fi
@@ -227,5 +228,5 @@ fi
 say "Done"
 echo "Installer:   $PKG ($(du -h "$PKG" | cut -f1 | tr -d ' '))"
 echo "Source code: $SRC"
-echo "Installs StudioRider $VERSION (AU + VST3, Apple Silicon + Intel, macOS $MIN_MACOS+) and cloudflared $CF_VERSION."
+echo "Installs StudioRider $SHOWN (AU + VST3, Apple Silicon + Intel, macOS $MIN_MACOS+) and cloudflared $CF_VERSION."
 pkgutil --check-signature "$PKG" 2>/dev/null | sed -n 2p || true

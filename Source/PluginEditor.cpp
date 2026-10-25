@@ -34,6 +34,13 @@ namespace
 
     const juce::String githubPage = "https://github.com/Creme74/StudioRider";
 
+    // Version as shown to people: "1.0" rather than "1.0.0" (the patch number only when it isn't 0).
+    juce::String shownVersion()
+    {
+        const juce::String v (JucePlugin_VersionString);
+        return v.endsWith (".0") && v.retainCharacters (".").length() == 2 ? v.dropLastCharacters (2) : v;
+    }
+
     juce::String formatKHz (std::uint32_t sr)
     {
         return juce::String (sr / 1000.0, sr % 1000 ? 1 : 0) + " kHz";
@@ -48,7 +55,7 @@ StudioRiderEditor::StudioRiderEditor (StudioRiderProcessor& p)
     title.setColour (juce::Label::textColourId, text);
     addAndMakeVisible (title);
 
-    versionLabel.setText (juce::String ("v") + JucePlugin_VersionString, juce::dontSendNotification);
+    versionLabel.setText ("v" + shownVersion(), juce::dontSendNotification);
     versionLabel.setFont (juce::FontOptions (15.0f));          // like "Public link"
     versionLabel.setColour (juce::Label::textColourId, text);
     versionLabel.setJustificationType (juce::Justification::bottomLeft);
@@ -447,7 +454,7 @@ void StudioRiderEditor::showMenu()
 
 void StudioRiderEditor::showAbout()
 {
-    const auto message = juce::String ("Version ") + JucePlugin_VersionString + "\n\n"
+    const auto message = "Version " + shownVersion() + "\n\n"
         + T ("Lets someone listen to your DAW in a web browser: lossless FLAC or Opus, "
              "through a free Cloudflare tunnel.\n\n"
              "Free software under the GNU General Public License, version 3 or later. "
@@ -507,7 +514,7 @@ void StudioRiderEditor::checkForPluginUpdate()
 
 void StudioRiderEditor::showUpdateResult (bool ok, const juce::String& tag, const juce::String& page, int status)
 {
-    const juce::String current (JucePlugin_VersionString);
+    const auto current = shownVersion();
     auto options = juce::MessageBoxOptions().withIconType (juce::MessageBoxIconType::NoIcon)
                                             .withAssociatedComponent (this);
     if (! ok)
