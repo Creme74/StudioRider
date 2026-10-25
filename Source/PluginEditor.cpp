@@ -32,6 +32,8 @@ namespace
         b.setColour (juce::ComboBox::outlineColourId, line);
     }
 
+    const juce::String githubPage = "https://github.com/Creme74/StudioRider";
+
     juce::String formatKHz (std::uint32_t sr)
     {
         return juce::String (sr / 1000.0, sr % 1000 ? 1 : 0) + " kHz";
@@ -45,6 +47,15 @@ StudioRiderEditor::StudioRiderEditor (StudioRiderProcessor& p)
     title.setFont (juce::FontOptions (22.0f, juce::Font::bold));
     title.setColour (juce::Label::textColourId, text);
     addAndMakeVisible (title);
+
+    versionLabel.setText (juce::String ("v") + JucePlugin_VersionString, juce::dontSendNotification);
+    versionLabel.setFont (juce::FontOptions (15.0f));          // like "Public link"
+    versionLabel.setColour (juce::Label::textColourId, text);
+    versionLabel.setJustificationType (juce::Justification::bottomLeft);
+    addAndMakeVisible (versionLabel);
+
+    menuButton.onClick = [this] { showMenu(); };
+    addAndMakeVisible (menuButton);
 
     shareButton.onClick = [this] { toggleSharing(); };
     addAndMakeVisible (shareButton);
@@ -168,7 +179,12 @@ void StudioRiderEditor::resized()
 {
     auto r = getLocalBounds().reduced (20, 16);
 
-    title.setBounds (r.removeFromTop (28));
+    auto titleRow = r.removeFromTop (28);
+    menuButton.setBounds (titleRow.removeFromRight (28));
+    const int titleW = (int) std::ceil (juce::GlyphArrangement::getStringWidth (title.getFont(), title.getText()))
+                       + title.getBorderSize().getLeftAndRight() + 2;
+    title.setBounds (titleRow.removeFromLeft (titleW));
+    versionLabel.setBounds (titleRow.withTrimmedBottom (3));
     r.removeFromTop (12);
 
     shareButton.setBounds (r.removeFromTop (40));
@@ -403,4 +419,121 @@ void StudioRiderEditor::refresh()
                       "stops working as soon as you stop.", juce::dontSendNotification);
     else
         hint.setText ("Put StudioRider last in the inserts of the master track.", juce::dontSendNotification);
+}
+
+//==============================================================================
+void MenuButton::paintButton (juce::Graphics& g, bool highlighted, bool down)
+{
+    auto r = getLocalBounds().toFloat().reduced (4.0f);
+    if (highlighted || down)
+    {
+        g.setColour (::panel.brighter (down ? 0.15f : 0.05f));
+        g.fillRoundedRectangle (r, 5.0f);
+    }
+    g.setColour (highlighted ? ::text : ::muted);
+    const float w = 14.0f, x = r.getCentreX() - w / 2.0f, y = r.getCentreY();
+    for (float dy : { -5.0f, 0.0f, 5.0f })
+        g.fillRoundedRectangle (x, y + dy - 1.0f, w, 2.0f, 1.0f);
+}
+
+void StudioRiderEditor::showMenu()
+{
+    juce::PopupMenu m;
+    m.addItem (T ("About StudioRider…"), [this] { showAbout(); });
+    m.addItem (T ("Check for updates…"), [this] { checkForPluginUpdate(); });
+    m.showMenuAsync (juce::PopupMenu::Options().withTargetComponent (&menuButton)
+                                               .withParentComponent (this));
+}
+
+void StudioRiderEditor::showAbout()
+{
+    const auto message = juce::String ("Version ") + JucePlugin_VersionString + "\n\n"
+        + T ("Lets someone listen to your DAW in a web browser: lossless FLAC or Opus, "
+             "through a free Cloudflare tunnel.\n\n"
+             "Free software under the GNU General Public License, version 3 or later. "
+             "It comes with no warranty.\n"
+             "Built with JUCE, civetweb, libFLAC, libopus, SpeexDSP and cloudflared.\n\n")
+        + githubPage.fromFirstOccurrenceOf ("https://", false, false);
+
+    auto options = juce::MessageBoxOptions()
+                       .withIconType (juce::MessageBoxIconType::NoIcon)
+                       .withTitle ("StudioRider")
+                       .withMessage (message)
+                       .withButton ("GitHub page")
+                       .withButton ("OK")
+                       .withAssociatedComponent (this);
+    juce::AlertWindow::showAsync (options, [] (int button)
+    {
+        if (button == 1)
+            juce::URL (githubPage).launchInDefaultBrowser();
+    });
+}
+
+void StudioRiderEditor::checkForPluginUpdate()
+{
+    const auto api = [] {
+        const auto custom = juce::SystemStats::getEnvironmentVariable ("STUDIORIDER_UPDATE_API", {}); // tests
+        return custom.isNotEmpty() ? custom
+                                   : juce::String ("https://api.github.com/repos/Creme74/StudioRider/releases/latest");
+    }();
+
+    juce::Component::SafePointer<StudioRiderEditor> safe (this);
+    juce::Thread::launch ([safe, api]
+    {
+        int status = 0;
+        juce::String tag, page;
+        const auto opts = juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
+                              .withExtraHeaders ("Accept: application/vnd.github+json\r\nUser-Agent: StudioRider")
+                              .withConnectionTimeoutMs (10000)
+                              .withNumRedirectsToFollow (5)
+                              .withStatusCode (&status);
+        if (auto in = juce::URL (api).createInputStream (opts))
+        {
+            const auto json = juce::JSON::parse (in->readEntireStreamAsString());
+            if (status == 200)
+            {
+                tag = json["tag_name"].toString().trim();
+                page = json["html_url"].toString();
+            }
+        }
+        const bool ok = tag.isNotEmpty();
+        juce::MessageManager::callAsync ([safe, ok, tag, page, status]
+        {
+            if (safe != nullptr)
+                safe->showUpdateResult (ok, tag, page, status);
+        });
+    });
+}
+
+void StudioRiderEditor::showUpdateResult (bool ok, const juce::String& tag, const juce::String& page, int status)
+{
+    const juce::String current (JucePlugin_VersionString);
+    auto options = juce::MessageBoxOptions().withIconType (juce::MessageBoxIconType::NoIcon)
+                                            .withAssociatedComponent (this);
+    if (! ok)
+    {
+        juce::AlertWindow::showAsync (options.withTitle ("Check for updates")
+                                             .withMessage (status > 0 ? "GitHub answered with error " + juce::String (status) + ". Try again later."
+                                                                      : juce::String ("Could not reach GitHub. Check your Internet connection."))
+                                             .withButton ("OK"), nullptr);
+        return;
+    }
+
+    const auto latest = tag.trimCharactersAtStart ("vV");
+    if (Cloudflared::compareVersions (latest, current) > 0)
+    {
+        const auto url = page.startsWith (githubPage) ? page : githubPage + "/releases/latest";
+        juce::AlertWindow::showAsync (options.withTitle ("StudioRider " + latest + " is available")
+                                             .withMessage ("You have version " + current + ". Download the new installer from GitHub, "
+                                                           "then quit your DAW and run it.")
+                                             .withButton ("Download page")
+                                             .withButton ("Later"),
+                                      [url] (int button) { if (button == 1) juce::URL (url).launchInDefaultBrowser(); });
+    }
+    else
+    {
+        juce::AlertWindow::showAsync (options.withTitle ("Check for updates")
+                                             .withMessage ("StudioRider is up to date (version " + current + ").")
+                                             .withButton ("OK"), nullptr);
+    }
 }

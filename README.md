@@ -69,6 +69,10 @@ DAW doesn't see the plugin twice.
 3. After 5 to 15 seconds the link appears: **Copy** it and send it to the listener.
 4. The listener opens the link and clicks **Listen**.
 
+The **☰** menu at the top right of the plugin's window has **About StudioRider**
+and **Check for updates**, which asks GitHub whether a newer StudioRider is out
+and opens its download page.
+
 The link changes every time you start sharing and stops working as soon as you
 stop sharing or close the project. Listeners who are listening then see
 "Sharing has ended". If the connection drops without warning (network, DAW

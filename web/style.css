@@ -154,6 +154,7 @@ h1 {
 /* Under the Buffer menu; its front wheel rolls over the line above the stats. */
 .logo {
   grid-column: 2;
+  grid-row: 3;
   justify-self: end;
   display: block;
   width: 100px;
@@ -184,10 +185,20 @@ h1 {
   border-top: 1px solid var(--line);
 }
 .stats div { min-width: 0; }
+/* Buffer and bitrate: next to the logo, just above the line. */
+.stats.top {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: end;
+  margin: 0 0 -8px;
+  padding: 0;
+  border: 0;
+}
 .stats dt { font-size: 11px; color: var(--muted); }
 .stats dd { margin: 0; font-size: 14px; font-variant-numeric: tabular-nums; }
 
-.note { margin: 16px 0 0; font-size: 12px; color: var(--muted); }
+/* The line the logo's front wheel rolls over. */
+.note { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
 
 @media (prefers-color-scheme: light) {
   :root {

@@ -9,7 +9,7 @@ if(NOT CMAKE_OSX_DEPLOYMENT_TARGET) # must be set before project(); ignored outs
     set(CMAKE_OSX_DEPLOYMENT_TARGET "13.0" CACHE STRING "Minimum macOS version")
 endif()
 
-project(StudioRider VERSION 0.6.2 LANGUAGES C CXX)
+project(StudioRider VERSION 1.0.0 LANGUAGES C CXX)
 
 option(STUDIORIDER_BUILD_PLUGIN  "Build the plugin (needs JUCE)" ON)
 option(STUDIORIDER_BUILD_HARNESS "Build the test tool (no JUCE)" OFF)

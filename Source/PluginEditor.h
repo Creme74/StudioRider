@@ -8,6 +8,14 @@
 
 #include "PluginProcessor.h"
 
+// The "three bars" menu button, top right.
+class MenuButton : public juce::Button
+{
+public:
+    MenuButton() : juce::Button ("Menu") { setTooltip ("Menu"); }
+    void paintButton (juce::Graphics&, bool highlighted, bool down) override;
+};
+
 class StudioRiderEditor : public juce::AudioProcessorEditor,
                        private juce::Timer
 {
@@ -24,10 +32,15 @@ private:
     void refresh();
     juce::String currentLink() const;
     void chooseCloudflared();
+    void showMenu();
+    void showAbout();
+    void checkForPluginUpdate();
+    void showUpdateResult (bool ok, const juce::String& tag, const juce::String& page, int status);
 
     StudioRiderProcessor& proc;
 
-    juce::Label title, linkCaption, status, hint;
+    juce::Label title, versionLabel, linkCaption, status, hint;
+    MenuButton menuButton;
     juce::TextButton shareButton, copyButton, locateButton, cfButton;
     juce::Label cfLabel;
     juce::ToggleButton tunnelToggle;
