@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #include "StreamServer.h"
 
@@ -11,7 +11,7 @@
 #include <cstring>
 #include <random>
 
-namespace studiowire
+namespace studiorider
 {
 
 namespace
@@ -463,7 +463,7 @@ void StreamServer::writerLoop (Listener* l)
 //==============================================================================
 std::string StreamServer::infoJson() const
 {
-    std::string s = "{\"type\":\"info\",\"name\":\"StudioWire\"";
+    std::string s = "{\"type\":\"info\",\"name\":\"StudioRider\"";
     s += std::string (",\"maxQuality\":\"") + qualityId (getMaxQuality()) + "\"";
     s += ",\"sampleRate\":"   + std::to_string (sampleRate.load());
     s += ",\"channels\":"     + std::to_string (kChannels);
@@ -648,4 +648,4 @@ void StreamServer::onWsClose (const mg_connection* conn, void* cbdata)
     }
 }
 
-} // namespace studiowire
+} // namespace studiorider

@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
-# Double-click this file (or run it in Terminal) to make the StudioWire installer
-# (build/StudioWire-<version>.pkg): AU + VST3 for Apple Silicon and Intel Macs,
+# Double-click this file (or run it in Terminal) to make the StudioRider installer
+# (build/StudioRider-<version>.pkg): AU + VST3 for Apple Silicon and Intel Macs,
 # with cloudflared included.
 cd "$(dirname "$0")"
 mkdir -p build

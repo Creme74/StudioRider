@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 // Checks the three qualities with the REAL decoders of the listening page
 // (web/flac-decoder.min.js and web/opus-decoder.min.js, run as they are).

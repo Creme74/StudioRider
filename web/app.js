@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 (() => {
   'use strict';
@@ -78,11 +78,11 @@
     ui.quality.disabled = true;
     ui.format.textContent = 'The studio is no longer sending any audio.';
     ui.listeners.textContent = '—';
-    document.title = 'StudioWire · Sharing ended';
+    document.title = 'StudioRider · Sharing ended';
   }
 
   try {
-    const saved = localStorage.getItem('studiowire.pref');
+    const saved = localStorage.getItem('studiorider.pref');
     if (saved === 'auto' || QUALITIES[saved]) pref = saved;
   } catch (e) {}
 
@@ -268,7 +268,7 @@
     building = (async () => {
       await c.audioWorklet.addModule(base + 'worklet.js');
       if (ctx !== c) return;
-      const n = new AudioWorkletNode(c, 'studiowire-player', {
+      const n = new AudioWorkletNode(c, 'studiorider-player', {
         numberOfInputs: 0,
         numberOfOutputs: 1,
         outputChannelCount: [2],
@@ -481,7 +481,7 @@
     const q = ui.quality.value;
     if (!QUALITIES[q]) return;
     pref = q === cap ? 'auto' : q; // picking the stream quality = follow the stream
-    try { localStorage.setItem('studiowire.pref', pref); } catch (e) {}
+    try { localStorage.setItem('studiorider.pref', pref); } catch (e) {}
     if (q !== quality) switchQuality(q); // inside the gesture: the audio context may restart
   });
 
@@ -524,7 +524,7 @@
   setInterval(() => { if (!running && !ended) loadInfo(); }, 5000);
 
   // For automated tests.
-  window.__studiowire = () => ({
+  window.__studiorider = () => ({
     running, ended, notice: ui.notice.hidden ? '' : ui.noticeTitle.textContent, failures, quality, cap, pref, options: [...ui.quality.options].map((o) => o.value), decoder: decoderKind, ctxRate, streamRate, gaps, netUnder, decodeErrors,
     stats: lastStats, ws: ws ? ws.readyState : -1,
   });

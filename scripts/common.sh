@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
 # Shared by build.sh and package.sh: tool checks and third-party downloads.
 # Meant to be sourced from the project's root folder.
@@ -16,8 +16,8 @@ MIN_MACOS="13.0"
 say() { printf "\n\033[1;38;5;208m==>\033[0m \033[1m%s\033[0m\n" "$*"; }
 die() { printf "\n\033[1;31mError:\033[0m %s\n" "$*" >&2; exit 1; }
 
-studiowire_version() {
-    sed -n 's/^project(StudioWire VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt
+studiorider_version() {
+    sed -n 's/^project(StudioRider VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt
 }
 
 check_tools() {

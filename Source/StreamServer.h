@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
-// StudioWire — built-in HTTP/WebSocket server (no JUCE dependency).
+// StudioRider — built-in HTTP/WebSocket server (no JUCE dependency).
 //
 // Job: take audio from the audio thread (lock-free, no allocation), encode it
 // (FLAC 16-bit, FLAC 24-bit or Opus, depending on what each listener chose)
@@ -28,7 +28,7 @@
 struct mg_context;
 struct mg_connection;
 
-namespace studiowire
+namespace studiorider
 {
 
 struct WebAsset
@@ -169,4 +169,4 @@ private:
     std::atomic<bool> quit { false };
 };
 
-} // namespace studiowire
+} // namespace studiorider

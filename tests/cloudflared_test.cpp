@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 // Checks the cloudflared finder and updater against a local fake release server
-// (started by tests/cloudflared_test.sh, which also sets the STUDIOWIRE_* variables).
+// (started by tests/cloudflared_test.sh, which also sets the STUDIORIDER_* variables).
 #include "Cloudflared.h"
 #include <cstdlib>
 #include <iostream>
@@ -22,7 +22,7 @@ static void waitIdle (Cloudflared& cf)
 
 int main()
 {
-    const auto api = juce::SystemStats::getEnvironmentVariable ("STUDIOWIRE_TEST_SERVER", {});
+    const auto api = juce::SystemStats::getEnvironmentVariable ("STUDIORIDER_TEST_SERVER", {});
     const auto support = Cloudflared::userDir();
 
     Cloudflared cf;
@@ -32,7 +32,7 @@ int main()
     check (cf.isGettingOld(), "a 2025.1 version counts as getting old");
     check (! cf.isUpdateAvailable(), "no update known before checking");
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/good").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/good").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     check (cf.getLatestVersion() == "2099.1.0" && cf.isUpdateAvailable(), "check: 2099.1.0 available - " + cf.getMessage());
@@ -45,7 +45,7 @@ int main()
            "installed into the support folder, download folder cleaned up");
     check (cf.getExecutable() == support.getChildFile ("cloudflared"), "the updated copy is the one that will run");
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/tgzsha").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/tgzsha").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     cf.installUpdate();
@@ -53,7 +53,7 @@ int main()
     b = cf.getCurrent();
     check (b.version == "2099.2.0", "checksum of the .tgz in the notes, no GitHub digest: accepted - " + cf.getMessage());
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/bad").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/bad").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     cf.installUpdate();
@@ -62,7 +62,7 @@ int main()
     check (cf.getMessage().contains ("Cloudflare's checksum") && b.version == "2099.2.0",
            "wrong checksum in the notes: rejected, previous copy kept - " + cf.getMessage());
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/baddigest").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/baddigest").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     cf.installUpdate();
@@ -72,12 +72,12 @@ int main()
                && ! support.getChildFile (".download").exists(),
            "wrong GitHub digest: rejected, download cleaned up - " + cf.getMessage());
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/nosha").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/nosha").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     check (cf.getMessage().contains ("no published checksum"), "no checksum published: refused - " + cf.getMessage());
 
-    ::setenv ("STUDIOWIRE_CLOUDFLARED_API", (api + "/missing").toRawUTF8(), 1);
+    ::setenv ("STUDIORIDER_CLOUDFLARED_API", (api + "/missing").toRawUTF8(), 1);
     cf.checkForUpdate();
     waitIdle (cf);
     check (cf.getMessage().contains ("error 404"), "server error reported - " + cf.getMessage());

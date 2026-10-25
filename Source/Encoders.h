@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
-// StudioWire — audio encoders (no JUCE dependency).
+// StudioRider — audio encoders (no JUCE dependency).
 //
 //   cd    : FLAC 16-bit with TPDF dither (CD quality, the default)
 //   hires : FLAC 24-bit, lossless relative to the plugin's output
@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-namespace studiowire
+namespace studiorider
 {
 
 enum class Quality : int { cd = 0, hires = 1, eco = 2 };
@@ -67,4 +67,4 @@ public:
 // Returns nullptr (and fills in "error") on failure.
 std::unique_ptr<Encoder> makeEncoder (Quality q, std::uint32_t sampleRate, bool dither, std::string& error);
 
-} // namespace studiowire
+} // namespace studiorider

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 // Checks the server's HTTP surface (security and served files).
 // Usage: node tests/check_http.mjs <local-url>

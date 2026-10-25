@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #include "PluginEditor.h"
+#include "BinaryData.h"
 
 namespace
 {
@@ -12,7 +13,14 @@ namespace
     const juce::Colour line      { 0xff2c3038 };
     const juce::Colour text      { 0xffeceef2 };
     const juce::Colour muted     { 0xff8b909c };
-    const juce::Colour accent    { 0xffff7a3d };
+    const juce::Colour accent    { 0xffc56a6b };   // the logo's red (#A10E10), lighter
+    const juce::Colour mint      { 0xffa8e2c4 };   // "Stop sharing" while sharing
+    const juce::Colour ink       { 0xff1e1212 };   // the logo's dark brown, for text on those buttons
+
+    // Where the front tyre touches the ground in logo.png, as a fraction of its height.
+    constexpr float logoTyreBottom = 0.9815f;
+    constexpr float logoHeight = 140.0f;
+    constexpr float logoBelowLine = 9.0f;          // the front wheel rolls over the separator
     const juce::Colour errColour { 0xffff6b6b };
 
     void styleButton (juce::TextButton& b, juce::Colour fill, juce::Colour ink)
@@ -30,10 +38,10 @@ namespace
     }
 }
 
-StudioWireEditor::StudioWireEditor (StudioWireProcessor& p)
+StudioRiderEditor::StudioRiderEditor (StudioRiderProcessor& p)
     : AudioProcessorEditor (&p), proc (p)
 {
-    title.setText ("StudioWire", juce::dontSendNotification);
+    title.setText ("StudioRider", juce::dontSendNotification);
     title.setFont (juce::FontOptions (22.0f, juce::Font::bold));
     title.setColour (juce::Label::textColourId, text);
     addAndMakeVisible (title);
@@ -122,25 +130,41 @@ StudioWireEditor::StudioWireEditor (StudioWireProcessor& p)
     hint.setJustificationType (juce::Justification::topLeft);
     addAndMakeVisible (hint);
 
+    logo = juce::ImageCache::getFromMemory (BinaryData::logo_png, BinaryData::logo_pngSize);
+
     setSize (520, 450);
     lastTime = juce::Time::getMillisecondCounterHiRes();
     refresh();
     startTimerHz (4);
 }
 
-StudioWireEditor::~StudioWireEditor()
+StudioRiderEditor::~StudioRiderEditor()
 {
     stopTimer();
 }
 
-void StudioWireEditor::paint (juce::Graphics& g)
+void StudioRiderEditor::paint (juce::Graphics& g)
 {
     g.fillAll (bg);
     g.setColour (line);
     g.drawHorizontalLine (separatorY, 20.0f, (float) getWidth() - 20.0f);
+
+    if (logo.isValid())
+    {
+        // While the tunnel starts, the moped idles: small random shakes.
+        auto area = logoArea;
+        if (revving)
+        {
+            g.addTransform (juce::AffineTransform::rotation (juce::degreesToRadians (rng.nextFloat() * 1.2f - 0.6f),
+                                                             area.getCentreX(), area.getBottom()));
+            area = area.translated (rng.nextFloat() * 3.0f - 1.5f, rng.nextFloat() * 2.0f - 1.0f);
+        }
+        g.setImageResamplingQuality (juce::Graphics::highResamplingQuality);
+        g.drawImage (logo, area, juce::RectanglePlacement::stretchToFit);
+    }
 }
 
-void StudioWireEditor::resized()
+void StudioRiderEditor::resized()
 {
     auto r = getLocalBounds().reduced (20, 16);
 
@@ -174,15 +198,33 @@ void StudioWireEditor::resized()
     cfLabel.setBounds (cfRow);
     r.removeFromBottom (8);
 
-    hint.setBounds (r.removeFromBottom (34));
+    hint.setBounds (r.removeFromBottom (34).withTrimmedTop (4));   // room for the front wheel
     r.removeFromBottom (6);
     separatorY = r.getBottom();
     r.removeFromBottom (6);
-    status.setBounds (r);
+
+    // Logo on the right, its front wheel rolling over the separator.
+    const float logoW = logo.isValid() ? logoHeight * (float) logo.getWidth() / (float) logo.getHeight() : 0.0f;
+    logoArea = { (float) r.getRight() - logoW,
+                 (float) separatorY + logoBelowLine - logoHeight * logoTyreBottom,
+                 logoW, logoHeight };
+    status.setBounds (r.withTrimmedRight ((int) logoW + 8));
 }
 
-void StudioWireEditor::timerCallback()
+void StudioRiderEditor::timerCallback()
 {
+    // The logo shakes while the tunnel starts (until the link shows up).
+    const bool shouldRev = proc.isSharing() && proc.isTunnelWanted()
+                           && proc.getTunnel().getState() == Tunnel::State::starting;
+    if (shouldRev || revving)
+        repaint (logoArea.expanded (6.0f).getSmallestIntegerContainer());
+    if (shouldRev != revving)
+    {
+        revving = shouldRev;
+        startTimerHz (revving ? 30 : 4);
+    }
+    if (revving && ++revFrames % 8 != 0)
+        return;   // the rest of the window only needs a few updates per second
     const auto now = juce::Time::getMillisecondCounterHiRes();
     const auto bytes = proc.getServer().getBytesSent();
     const auto dt = (now - lastTime) / 1000.0;
@@ -195,7 +237,7 @@ void StudioWireEditor::timerCallback()
     refresh();
 }
 
-juce::String StudioWireEditor::currentLink() const
+juce::String StudioRiderEditor::currentLink() const
 {
     if (! proc.isSharing())
         return {};
@@ -204,7 +246,7 @@ juce::String StudioWireEditor::currentLink() const
     return proc.getLocalLink();
 }
 
-void StudioWireEditor::toggleSharing()
+void StudioRiderEditor::toggleSharing()
 {
     lastError.clear();
     if (proc.isSharing())
@@ -222,7 +264,7 @@ void StudioWireEditor::toggleSharing()
     refresh();
 }
 
-void StudioWireEditor::chooseCloudflared()
+void StudioRiderEditor::chooseCloudflared()
 {
     chooser = std::make_unique<juce::FileChooser> ("Where is cloudflared?", juce::File ("/opt/homebrew/bin"), "*");
     chooser->launchAsync (juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles,
@@ -238,7 +280,7 @@ void StudioWireEditor::chooseCloudflared()
                           });
 }
 
-void StudioWireEditor::refresh()
+void StudioRiderEditor::refresh()
 {
     const bool sharing = proc.isSharing();
     auto& server = proc.getServer();
@@ -247,7 +289,7 @@ void StudioWireEditor::refresh()
     const auto cloudflared = proc.getCloudflared();
 
     shareButton.setButtonText (sharing ? "Stop sharing" : "Start sharing");
-    styleButton (shareButton, sharing ? panel : accent, sharing ? text : juce::Colour (0xff1a0d06));
+    styleButton (shareButton, sharing ? mint : accent, ink);
     tunnelToggle.setEnabled (! sharing);
 
     const auto link = currentLink();
@@ -323,9 +365,9 @@ void StudioWireEditor::refresh()
         auto listenersLine = "Listeners: " + juce::String (server.getListenerCount()) + " / "
                            + juce::String (server.getMaxListeners());
         if (server.getListenerCount() > 0)
-            listenersLine << " (CD " << server.getListenerCount (studiowire::Quality::cd)
-                          << T (" · Hi-Res ") << server.getListenerCount (studiowire::Quality::hires)
-                          << T (" · Opus ") << server.getListenerCount (studiowire::Quality::eco) << ")";
+            listenersLine << " (CD " << server.getListenerCount (studiorider::Quality::cd)
+                          << T (" · Hi-Res ") << server.getListenerCount (studiorider::Quality::hires)
+                          << T (" · Opus ") << server.getListenerCount (studiorider::Quality::eco) << ")";
         listenersLine << T ("   ·   Sent: ")
                       << (bitrate < 1.0e6 ? juce::String (bitrate / 1.0e3, 0) + " kbps"
                                           : juce::String (bitrate / 1.0e6, 2) + " Mbps");
@@ -360,5 +402,5 @@ void StudioWireEditor::refresh()
         hint.setText ("Send this link to the listener. It changes every time you start sharing and "
                       "stops working as soon as you stop.", juce::dontSendNotification);
     else
-        hint.setText ("Put StudioWire last in the inserts of the master track.", juce::dontSendNotification);
+        hint.setText ("Put StudioRider last in the inserts of the master track.", juce::dontSendNotification);
 }

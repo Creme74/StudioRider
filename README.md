@@ -2,7 +2,7 @@
   <img src="docs/images/nagra.png" width="360" alt="Nagra IV-S tape recorder">
 </p>
 
-# StudioWire
+# StudioRider
 
 An AU / VST3 plugin that lets someone listen to your DAW's output in a web
 browser (Chrome, Firefox, Safari, phones included), in lossless FLAC or in Opus
@@ -11,11 +11,11 @@ page and the stream itself, and a Cloudflare Quick Tunnel makes it reachable
 from the Internet.
 
 ```
-DAW (master) ─► StudioWire ─► local server 127.0.0.1 ─► cloudflared ─► https://….trycloudflare.com ─► browser
+DAW (master) ─► StudioRider ─► local server 127.0.0.1 ─► cloudflared ─► https://….trycloudflare.com ─► browser
 ```
 
 <p align="center">
-  <img src="docs/images/plugin.png" width="57%" alt="The StudioWire plugin window: Start sharing, stream quality, link to send to the listener">
+  <img src="docs/images/plugin.png" width="57%" alt="The StudioRider plugin window: Start sharing, stream quality, link to send to the listener">
   &nbsp;
   <img src="docs/images/listener.png" width="36%" alt="The listening page in a browser: playing in CD quality, level meters, quality and buffer settings">
 </p>
@@ -30,41 +30,42 @@ DAW (master) ─► StudioWire ─► local server 127.0.0.1 ─► cloudflared 
 
 ## Installing
 
-Download **[StudioWire-0.6.1.pkg](https://github.com/Creme74/StudioWire/releases/download/v0.6.1/StudioWire-0.6.1.pkg)**
-(or the latest version from the **[Releases](https://github.com/Creme74/StudioWire/releases/latest)** page)
+Download **[StudioRider-0.6.2.pkg](https://github.com/Creme74/StudioRider/releases/download/v0.6.2/StudioRider-0.6.2.pkg)**
+(or the latest version from the **[Releases](https://github.com/Creme74/StudioRider/releases/latest)** page)
 and open it. It installs, for all users:
 
 | What | Where |
 |---|---|
-| Audio Unit | `/Library/Audio/Plug-Ins/Components/StudioWire.component` |
-| VST3 | `/Library/Audio/Plug-Ins/VST3/StudioWire.vst3` |
-| Uninstaller | `/Applications/StudioWire/Uninstall StudioWire.app` |
-| cloudflared, licences | `/Library/Application Support/StudioWire` |
+| Audio Unit | `/Library/Audio/Plug-Ins/Components/StudioRider.component` |
+| VST3 | `/Library/Audio/Plug-Ins/VST3/StudioRider.vst3` |
+| Uninstaller | `/Applications/StudioRider/Uninstall StudioRider.app` |
+| cloudflared, licences | `/Library/Application Support/StudioRider` |
 
 The installer is not signed with an Apple Developer ID yet, so macOS refuses to
 open it the first time:
 
 - macOS 15 and later: open it once, click **Done**, then **System Settings >
-  Privacy & Security**, scroll down to the message about StudioWire and click
+  Privacy & Security**, scroll down to the message about StudioRider and click
   **Open Anyway**.
 - macOS 13 and 14: right-click (or Control-click) the `.pkg`, choose **Open**,
   then **Open** again.
 
-If your DAW was open, quit and reopen it. If StudioWire doesn't show up, make
+If your DAW was open, quit and reopen it. If StudioRider doesn't show up, make
 your DAW rescan its plugins (in its plugin settings).
 
-To uninstall: **Applications > StudioWire > Uninstall StudioWire**. It asks for
+To uninstall: **Applications > StudioRider > Uninstall StudioRider**. It asks for
 your password and removes the plugins, cloudflared (including updates downloaded
 from the plugin) and itself. Your projects are not touched.
 
-StudioWire was previously called MixShare. It keeps the same plugin codes, so
-projects that used MixShare open with StudioWire. The installer removes copies
-of StudioWire or MixShare from your own `~/Library/Audio/Plug-Ins` folder, so the
+StudioRider was previously called StudioWire, and before that MixShare. It keeps
+the same plugin codes, so projects that used them open with StudioRider. The
+installer removes the former versions, and copies of the plugin in your own
+`~/Library/Audio/Plug-Ins` folder, so the
 DAW doesn't see the plugin twice.
 
 ## Using it
 
-1. Insert **StudioWire** last on the master track.
+1. Insert **StudioRider** last on the master track.
 2. Pick the **Stream quality**, then click **Start sharing**.
 3. After 5 to 15 seconds the link appears: **Copy** it and send it to the listener.
 4. The listener opens the link and clicks **Listen**.
@@ -83,11 +84,11 @@ at the bottom of the plugin's window shows which copy is used, and:
 - **Check for update** asks GitHub for Cloudflare's latest release;
 - **Update to …** downloads it, checks it against the SHA-256 checksum published
   with the release (a file that doesn't match is thrown away), and keeps it in
-  `~/Library/Application Support/StudioWire`. It is used from the next
+  `~/Library/Application Support/StudioRider`. It is used from the next
   **Start sharing** on;
 - "getting old" appears when the copy in use is more than 6 months old.
 
-StudioWire uses the newest copy it finds among: the updated one, the installed
+StudioRider uses the newest copy it finds among: the updated one, the installed
 one, and Homebrew's (`brew install cloudflared`). If none is found, the button
 becomes **Download cloudflared**. If none is found, or the one found doesn't run
 on this Mac, **Choose…** lets you pick a cloudflared file yourself.
@@ -137,17 +138,17 @@ installed automatically if missing (with Homebrew, or into `.tools/`). The
 scripts download JUCE, civetweb, libFLAC, libopus and SpeexDSP at the versions
 pinned in `scripts/common.sh`.
 
-**For yourself:** `./build.sh` (or double-click **Build StudioWire.command**)
+**For yourself:** `./build.sh` (or double-click **Build StudioRider.command**)
 builds for this Mac's processor, installs the AU and VST3 into
 `~/Library/Audio/Plug-Ins`, and runs `auval`. It doesn't install cloudflared:
 the plugin offers to download it.
 
-**The installer:** `./package.sh` (or double-click **Make StudioWire
+**The installer:** `./package.sh` (or double-click **Make StudioRider
 Installer.command**) builds the AU and VST3 for Apple Silicon and Intel
 (macOS 13+), downloads cloudflared for both, and writes:
 
-- `build/StudioWire-<version>.pkg`, the installer;
-- `build/StudioWire-<version>-source.tar.gz`, the matching source code.
+- `build/StudioRider-<version>.pkg`, the installer;
+- `build/StudioRider-<version>-source.tar.gz`, the matching source code.
 
 Signing is optional. With an Apple Developer ID:
 
@@ -171,16 +172,16 @@ NOTARY_PROFILE=<notarytool keychain profile> ./package.sh
 - `packaging/`: what `package.sh` puts in the installer, including the
   uninstaller (`packaging/uninstaller/`).
 - `tests/`:
-  - a test tool without a DAW (`-DSTUDIOWIRE_BUILD_PLUGIN=OFF -DSTUDIOWIRE_BUILD_HARNESS=ON`);
+  - a test tool without a DAW (`-DSTUDIORIDER_BUILD_PLUGIN=OFF -DSTUDIORIDER_BUILD_HARNESS=ON`);
   - HTTP checks (`check_http.mjs`) and bit-exact checks of the three qualities
     with the page's decoders (`check_codecs.mjs`);
-  - stream quality save/restore (`state_test.cpp`, `-DSTUDIOWIRE_BUILD_STATE_TEST=ON`);
+  - stream quality save/restore (`state_test.cpp`, `-DSTUDIORIDER_BUILD_STATE_TEST=ON`);
   - the cloudflared updater against a fake release server (`cloudflared_test.sh`,
-    `-DSTUDIOWIRE_BUILD_CLOUDFLARED_TEST=ON`).
+    `-DSTUDIORIDER_BUILD_CLOUDFLARED_TEST=ON`).
 
 ## Licence
 
-StudioWire is free software: you can redistribute it and/or modify it under the
+StudioRider is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version. It is distributed in the hope that it will be useful, but WITHOUT ANY

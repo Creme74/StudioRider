@@ -1,15 +1,21 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
 # Runs as root before the files are copied: removes the previous version, so that
 # no stale file stays behind (inside the plugin bundles or in the support folder).
-for p in "/Library/Audio/Plug-Ins/Components/StudioWire.component" \
+for p in "/Library/Audio/Plug-Ins/Components/StudioRider.component" \
+         "/Library/Audio/Plug-Ins/VST3/StudioRider.vst3" \
+         "/Library/Application Support/StudioRider" \
+         "/Applications/StudioRider" \
+         "/Library/Audio/Plug-Ins/Components/StudioWire.component" \
          "/Library/Audio/Plug-Ins/VST3/StudioWire.vst3" \
-         "/Library/Audio/Plug-Ins/Components/MixShare.component" \
-         "/Library/Audio/Plug-Ins/VST3/MixShare.vst3" \
          "/Library/Application Support/StudioWire" \
-         "/Applications/StudioWire"; do
+         "/Applications/StudioWire" \
+         "/Library/Audio/Plug-Ins/Components/MixShare.component" \
+         "/Library/Audio/Plug-Ins/VST3/MixShare.vst3"; do
     [[ -e "$p" ]] && rm -rf "$p"
 done
+# StudioWire = former name of StudioRider (same plugin codes): forget its installer receipt.
+/usr/sbin/pkgutil --forget net.studiowire.pkg >/dev/null 2>&1 || true
 exit 0

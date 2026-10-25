@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 // Test tool without JUCE: simulates a DAW's audio thread and feeds the server
 // in real time.
 //   --pattern sine   : two sines (440 Hz left, 660 Hz right), to listen to
 //   --pattern ramp   : deterministic sequence to check bit-exactness
-// Example: studiowire_harness --port 47800 --token test --seconds 60
+// Example: studiorider_harness --port 47800 --token test --seconds 60
 
 #include "StreamServer.h"
 
@@ -48,23 +48,23 @@ int main (int argc, char** argv)
     std::signal (SIGINT, onSignal);
     std::signal (SIGTERM, onSignal);
 
-    studiowire::StreamServer server;
-    studiowire::StreamServer::Options opts;
+    studiorider::StreamServer server;
+    studiorider::StreamServer::Options opts;
     opts.firstPort = port;
     opts.token = token;
     opts.dither = dither;
-    studiowire::parseQuality (maxQ.c_str(), opts.maxQuality);
+    studiorider::parseQuality (maxQ.c_str(), opts.maxQuality);
 
     // Scheduled stream quality changes (to test changing the cap while live).
-    std::vector<std::pair<double, studiowire::Quality>> changes;
+    std::vector<std::pair<double, studiorider::Quality>> changes;
     for (std::size_t pos = 0; pos < schedule.size();)
     {
         auto comma = schedule.find (',', pos);
         if (comma == std::string::npos) comma = schedule.size();
         const auto item = schedule.substr (pos, comma - pos);
         const auto at = item.find ('@');
-        studiowire::Quality q;
-        if (at != std::string::npos && studiowire::parseQuality (item.substr (0, at).c_str(), q))
+        studiorider::Quality q;
+        if (at != std::string::npos && studiorider::parseQuality (item.substr (0, at).c_str(), q))
             changes.emplace_back (std::atof (item.substr (at + 1).c_str()), q);
         pos = comma + 1;
     }
@@ -133,7 +133,7 @@ int main (int argc, char** argv)
         while (nextChange < changes.size() && elapsed >= changes[nextChange].first)
         {
             server.setMaxQuality (changes[nextChange].second);
-            std::printf ("Stream quality: %s (%.1f s)\n", studiowire::qualityId (changes[nextChange].second), elapsed);
+            std::printf ("Stream quality: %s (%.1f s)\n", studiorider::qualityId (changes[nextChange].second), elapsed);
             std::fflush (stdout);
             ++nextChange;
         }

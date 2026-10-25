@@ -1,12 +1,12 @@
 # Third-party software
 
-StudioWire is free software, licensed under the GNU General Public License,
+StudioRider is free software, licensed under the GNU General Public License,
 version 3 or (at your option) any later version: see [LICENSE](LICENSE).
 
 It is built with the software below. The build scripts download it from its
 authors' GitHub repositories, at the versions pinned in `scripts/common.sh`; none
 of it is modified. The installer copies these licence texts to
-`/Library/Application Support/StudioWire/Licenses`.
+`/Library/Application Support/StudioRider/Licenses`.
 
 ## Inside the plugin (statically linked)
 
@@ -52,4 +52,4 @@ release, and combines the Apple Silicon and Intel versions into one file
 
 Audio Units is a trademark of Apple Inc. VST is a registered
 trademark of Steinberg Media Technologies GmbH. Cloudflare is a trademark of
-Cloudflare, Inc. StudioWire is not affiliated with any of them.
+Cloudflare, Inc. StudioRider is not affiliated with any of them.

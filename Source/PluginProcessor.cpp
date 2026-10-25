@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-StudioWireProcessor::StudioWireProcessor()
+StudioRiderProcessor::StudioRiderProcessor()
     : AudioProcessor (BusesProperties()
                           .withInput ("Input", juce::AudioChannelSet::stereo(), true)
                           .withOutput ("Output", juce::AudioChannelSet::stereo(), true))
@@ -22,25 +22,25 @@ StudioWireProcessor::StudioWireProcessor()
     startTimerHz (10);
 }
 
-StudioWireProcessor::~StudioWireProcessor()
+StudioRiderProcessor::~StudioRiderProcessor()
 {
     stopTimer();
     stopSharing();
 }
 
-void StudioWireProcessor::timerCallback()
+void StudioRiderProcessor::timerCallback()
 {
     const auto q = getMaxQuality();
     if (server.getMaxQuality() != q)
         server.setMaxQuality (q);
 }
 
-void StudioWireProcessor::prepareToPlay (double sampleRate, int)
+void StudioRiderProcessor::prepareToPlay (double sampleRate, int)
 {
     server.setSampleRate (sampleRate);
 }
 
-bool StudioWireProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool StudioRiderProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
     const auto out = layouts.getMainOutputChannelSet();
     if (out != juce::AudioChannelSet::stereo() && out != juce::AudioChannelSet::mono())
@@ -48,7 +48,7 @@ bool StudioWireProcessor::isBusesLayoutSupported (const BusesLayout& layouts) co
     return layouts.getMainInputChannelSet() == out;
 }
 
-void StudioWireProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
+void StudioRiderProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -59,13 +59,13 @@ void StudioWireProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::
 }
 
 //==============================================================================
-bool StudioWireProcessor::startSharing (bool withTunnel, juce::String& error)
+bool StudioRiderProcessor::startSharing (bool withTunnel, juce::String& error)
 {
     tunnelWanted = withTunnel;
 
     if (! server.isRunning())
     {
-        studiowire::StreamServer::Options opts;
+        studiorider::StreamServer::Options opts;
         opts.maxQuality = getMaxQuality();
         std::string err;
         if (! server.start (opts, err))
@@ -93,7 +93,7 @@ bool StudioWireProcessor::startSharing (bool withTunnel, juce::String& error)
     return true;
 }
 
-void StudioWireProcessor::stopSharing()
+void StudioRiderProcessor::stopSharing()
 {
     const bool hadListeners = server.getListenerCount() > 0;
     server.stop();  // tells the listeners first (the tunnel must still be up)
@@ -102,7 +102,7 @@ void StudioWireProcessor::stopSharing()
     tunnel.stop();
 }
 
-juce::String StudioWireProcessor::getPublicLink() const
+juce::String StudioRiderProcessor::getPublicLink() const
 {
     const auto base = tunnel.getPublicUrl();
     if (base.isEmpty() || ! server.isRunning())
@@ -110,45 +110,46 @@ juce::String StudioWireProcessor::getPublicLink() const
     return base + juce::String (server.getPath());
 }
 
-juce::String StudioWireProcessor::getLocalLink() const
+juce::String StudioRiderProcessor::getLocalLink() const
 {
     return server.isRunning() ? juce::String (server.getLocalUrl()) : juce::String();
 }
 
 //==============================================================================
-void StudioWireProcessor::getStateInformation (juce::MemoryBlock& destData)
+void StudioRiderProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     // "Sharing active" is never saved: when a project opens, nothing is
     // exposed until you click Start sharing.
-    juce::ValueTree state ("StudioWire");
+    juce::ValueTree state ("StudioRider");
     state.setProperty ("cloudflared", cloudflared.getOverride().getFullPathName(), nullptr);
     state.setProperty ("tunnel", tunnelWanted, nullptr);
-    state.setProperty ("maxQuality", studiowire::qualityId (getMaxQuality()), nullptr);
+    state.setProperty ("maxQuality", studiorider::qualityId (getMaxQuality()), nullptr);
     juce::MemoryOutputStream out (destData, false);
     state.writeToStream (out);
 }
 
-void StudioWireProcessor::setStateInformation (const void* data, int sizeInBytes)
+void StudioRiderProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     const auto state = juce::ValueTree::readFromData (data, (size_t) sizeInBytes);
-    if (! state.hasType ("StudioWire") && ! state.hasType ("MixShare")) // MixShare = former name
+    // StudioWire and MixShare: former names, same plugin codes.
+    if (! state.hasType ("StudioRider") && ! state.hasType ("StudioWire") && ! state.hasType ("MixShare"))
         return;
     const auto path = state.getProperty ("cloudflared").toString();
     cloudflared.setOverride (juce::File::isAbsolutePath (path) ? juce::File (path) : juce::File());
     tunnelWanted = (bool) state.getProperty ("tunnel", true);
 
-    studiowire::Quality q;
-    if (studiowire::parseQuality (state.getProperty ("maxQuality", "cd").toString().toRawUTF8(), q))
-        *maxQualityParam = studiowire::qualityRank (q);
+    studiorider::Quality q;
+    if (studiorider::parseQuality (state.getProperty ("maxQuality", "cd").toString().toRawUTF8(), q))
+        *maxQualityParam = studiorider::qualityRank (q);
 }
 
 //==============================================================================
-juce::AudioProcessorEditor* StudioWireProcessor::createEditor()
+juce::AudioProcessorEditor* StudioRiderProcessor::createEditor()
 {
-    return new StudioWireEditor (*this);
+    return new StudioRiderEditor (*this);
 }
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new StudioWireProcessor();
+    return new StudioRiderProcessor();
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #include "Encoders.h"
 
@@ -11,7 +11,7 @@
 #include <cmath>
 #include <cstring>
 
-namespace studiowire
+namespace studiorider
 {
 
 const char* qualityId (Quality q) noexcept
@@ -275,4 +275,4 @@ std::unique_ptr<Encoder> makeEncoder (Quality q, std::uint32_t sampleRate, bool 
     return e;
 }
 
-} // namespace studiowire
+} // namespace studiorider

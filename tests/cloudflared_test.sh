@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
 # Runs tests/cloudflared_test against a local fake GitHub release server.
-# Usage: tests/cloudflared_test.sh <path to studiowire_cloudflared_test>
+# Usage: tests/cloudflared_test.sh <path to studiorider_cloudflared_test>
 set -euo pipefail
 TEST_BIN="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 work="$(mktemp -d)"
@@ -65,8 +65,8 @@ port="$(cat "$work/port")"
 
 cd "$work"
 env PATH=/usr/bin:/bin \
-    STUDIOWIRE_TEST_SERVER="http://127.0.0.1:$port" \
-    STUDIOWIRE_CLOUDFLARED_ASSET="$asset" \
-    STUDIOWIRE_SUPPORT_DIR="$work/support" \
-    STUDIOWIRE_BUNDLED_DIR="$work/bundled" \
+    STUDIORIDER_TEST_SERVER="http://127.0.0.1:$port" \
+    STUDIORIDER_CLOUDFLARED_ASSET="$asset" \
+    STUDIORIDER_SUPPORT_DIR="$work/support" \
+    STUDIORIDER_BUNDLED_DIR="$work/bundled" \
     "$TEST_BIN"

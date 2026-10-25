@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
-// StudioWire — starts a Cloudflare "Quick Tunnel" (cloudflared) to the local
+// StudioRider — starts a Cloudflare "Quick Tunnel" (cloudflared) to the local
 // server and picks up the public address https://….trycloudflare.com.
 
 #pragma once

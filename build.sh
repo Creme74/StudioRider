@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
-# Builds StudioWire (AU + VST3) for this Mac and installs it for the current user.
+# Builds StudioRider (AU + VST3) for this Mac and installs it for the current user.
 # To make the installer (.pkg) for other people, use ./package.sh instead.
 set -euo pipefail
 cd "$(dirname "$0")"
@@ -21,22 +21,23 @@ CMAKE_DIR=build/cmake
 cmake_build "$CMAKE_DIR" "$(uname -m)" -DCMAKE_OSX_DEPLOYMENT_TARGET="$MIN_MACOS"
 
 PLUGINS="$HOME/Library/Audio/Plug-Ins"
-AU="$PLUGINS/Components/StudioWire.component"
-VST3="$PLUGINS/VST3/StudioWire.vst3"
+AU="$PLUGINS/Components/StudioRider.component"
+VST3="$PLUGINS/VST3/StudioRider.vst3"
 
 say "Installing and signing locally"
 mkdir -p "$(dirname "$AU")" "$(dirname "$VST3")"
-# The former name (MixShare) uses the same plugin codes: remove it so the DAW doesn't see it twice.
-rm -rf "$PLUGINS/Components/MixShare.component" "$PLUGINS/VST3/MixShare.vst3"
+# The former names (StudioWire, MixShare) use the same plugin codes: remove them so the DAW doesn't see it twice.
+rm -rf "$PLUGINS/Components/StudioWire.component" "$PLUGINS/VST3/StudioWire.vst3" \
+       "$PLUGINS/Components/MixShare.component" "$PLUGINS/VST3/MixShare.vst3"
 rm -rf "$AU" "$VST3"
-cp -R "$CMAKE_DIR/StudioWire_artefacts/Release/AU/StudioWire.component" "$AU"
-cp -R "$CMAKE_DIR/StudioWire_artefacts/Release/VST3/StudioWire.vst3" "$VST3"
+cp -R "$CMAKE_DIR/StudioRider_artefacts/Release/AU/StudioRider.component" "$AU"
+cp -R "$CMAKE_DIR/StudioRider_artefacts/Release/VST3/StudioRider.vst3" "$VST3"
 codesign --force --deep --sign - "$AU" >/dev/null 2>&1
 codesign --force --deep --sign - "$VST3" >/dev/null 2>&1
 echo "AU:   $AU"
 echo "VST3: $VST3"
-if [[ -d "/Library/Audio/Plug-Ins/Components/StudioWire.component" ]]; then
-    echo "Note: StudioWire is also installed for all users (from the installer). Your DAW may see two copies."
+if [[ -d "/Library/Audio/Plug-Ins/Components/StudioRider.component" ]]; then
+    echo "Note: StudioRider is also installed for all users (from the installer). Your DAW may see two copies."
 fi
 
 say "Validating the Audio Unit (auval)"
@@ -50,6 +51,6 @@ else
 fi
 
 say "Done"
-echo "In your DAW: insert StudioWire last on the master track."
+echo "In your DAW: insert StudioRider last on the master track."
 echo "If it doesn't show up, make your DAW rescan its plugins."
 echo "If cloudflared is missing, the plugin offers to download it (Download cloudflared)."

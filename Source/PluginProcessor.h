@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #pragma once
 
@@ -9,12 +9,12 @@
 #include "StreamServer.h"
 #include "Tunnel.h"
 
-class StudioWireProcessor : public juce::AudioProcessor,
+class StudioRiderProcessor : public juce::AudioProcessor,
                           private juce::Timer
 {
 public:
-    StudioWireProcessor();
-    ~StudioWireProcessor() override;
+    StudioRiderProcessor();
+    ~StudioRiderProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -26,7 +26,7 @@ public:
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override                     { return true; }
 
-    const juce::String getName() const override        { return "StudioWire"; }
+    const juce::String getName() const override        { return "StudioRider"; }
     bool acceptsMidi() const override                   { return false; }
     bool producesMidi() const override                  { return false; }
     bool isMidiEffect() const override                  { return false; }
@@ -51,26 +51,26 @@ public:
     juce::String getPublicLink() const;   // empty until the tunnel is ready
     juce::String getLocalLink() const;
 
-    studiowire::StreamServer& getServer()                 { return server; }
+    studiorider::StreamServer& getServer()                 { return server; }
     Tunnel& getTunnel()                                 { return tunnel; }
 
     juce::File getCloudflared() const                   { return cloudflared.getExecutable(); }
     Cloudflared& getCloudflaredManager()                { return cloudflared; }
 
     // Stream quality: a plugin parameter, so the DAW saves it with the project.
-    // Index 0 = Opus, 1 = CD, 2 = Hi-Res (same order as studiowire::qualityRank).
+    // Index 0 = Opus, 1 = CD, 2 = Hi-Res (same order as studiorider::qualityRank).
     juce::AudioParameterChoice& getMaxQualityParam()    { return *maxQualityParam; }
-    studiowire::Quality getMaxQuality() const             { return studiowire::qualityFromRank (maxQualityParam->getIndex()); }
+    studiorider::Quality getMaxQuality() const             { return studiorider::qualityFromRank (maxQualityParam->getIndex()); }
     void setCloudflaredOverride (const juce::File& f)   { cloudflared.setOverride (f); }
 
 private:
     void timerCallback() override;      // applies the stream quality (message thread)
 
     juce::AudioParameterChoice* maxQualityParam = nullptr;
-    studiowire::StreamServer server;
+    studiorider::StreamServer server;
     Tunnel tunnel;
     Cloudflared cloudflared;
     bool tunnelWanted = true;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StudioWireProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StudioRiderProcessor)
 };

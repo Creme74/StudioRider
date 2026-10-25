@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
-<!-- Copyright (C) 2026 The StudioWire authors -->
+<!-- Copyright (C) 2026 The StudioRider authors -->
 <!-- Template: package.sh fills in the @…@ values. -->
 <installer-gui-script minSpecVersion="2">
-    <title>StudioWire @VERSION@</title>
+    <title>StudioRider @VERSION@</title>
     <welcome file="welcome.html" mime-type="text/html"/>
     <conclusion file="conclusion.html" mime-type="text/html"/>
     <options customize="never" require-scripts="false" hostArchitectures="x86_64,arm64"/>
@@ -12,8 +12,8 @@
     <script><![CDATA[
     function checkMacOS() {
         if (system.compareVersions(system.version.ProductVersion, '@MIN_MACOS@') < 0) {
-            my.result.title = 'StudioWire needs macOS 13 or later';
-            my.result.message = 'StudioWire sends what your DAW plays to listeners through a Cloudflare link, '
+            my.result.title = 'StudioRider needs macOS 13 or later';
+            my.result.message = 'StudioRider sends what your DAW plays to listeners through a Cloudflare link, '
                 + 'and Cloudflare\'s program (cloudflared) only runs on macOS 13 Ventura or later. '
                 + 'This Mac has macOS ' + system.version.ProductVersion + '.';
             my.result.type = 'Fatal';
@@ -36,5 +36,5 @@
     <choice id="@PKG_ID@" visible="false">
         <pkg-ref id="@PKG_ID@"/>
     </choice>
-    <pkg-ref id="@PKG_ID@" version="@VERSION@" onConclusion="none">StudioWire.pkg</pkg-ref>
+    <pkg-ref id="@PKG_ID@" version="@VERSION@" onConclusion="none">StudioRider.pkg</pkg-ref>
 </installer-gui-script>

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 #include "Tunnel.h"
 
@@ -19,7 +19,7 @@ namespace
     }
 }
 
-Tunnel::Tunnel() : juce::Thread ("StudioWire tunnel") {}
+Tunnel::Tunnel() : juce::Thread ("StudioRider tunnel") {}
 
 Tunnel::~Tunnel()
 {

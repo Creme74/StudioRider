@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
-/* Copyright (C) 2026 The StudioWire authors */
+/* Copyright (C) 2026 The StudioRider authors */
 :root {
   --bg: #0e0f12;
   --card: #17191e;
   --line: #2a2d35;
   --text: #eceef2;
   --muted: #8b909c;
-  --accent: #ff7a3d;
-  --accent-ink: #1a0d06;
+  --accent: #c56a6b;      /* the logo's red (#A10E10), lighter */
+  --accent-ink: #1e1212;  /* the logo's dark brown */
   --ok: #4cd18a;
   --wait: #e6b84a;
   --err: #ff5d5d;
@@ -51,9 +51,7 @@ body {
 
 .brand {
   font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--muted);
 }
 
@@ -153,6 +151,18 @@ h1 {
 .ctl { display: grid; gap: 6px; font-size: 12px; color: var(--muted); min-width: 0; }
 .ctl.wide { grid-column: 1 / -1; }
 .ctl.wide select { width: 100%; }
+/* Under the Buffer menu; its front wheel rolls over the line above the stats. */
+.logo {
+  grid-column: 2;
+  justify-self: end;
+  display: block;
+  width: 100px;
+  height: auto;
+  margin: -4px 0 -29px;
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
 .ctl output { color: var(--text); font-variant-numeric: tabular-nums; }
 .ctl input[type="range"] { width: 100%; accent-color: var(--accent); }
 .ctl select {
@@ -186,8 +196,8 @@ h1 {
     --line: #e3e1dc;
     --text: #17181b;
     --muted: #6b6f78;
-    --accent: #e8611f;
-    --accent-ink: #ffffff;
+    --accent: #c56a6b;
+    --accent-ink: #1e1212;
     --ok: #198754;
     --wait: #a8770c;
     --err: #c62828;

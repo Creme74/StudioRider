@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
-// StudioWire — finds the cloudflared program, reports its version, and updates it
+// Copyright (C) 2026 The StudioRider authors
+// StudioRider — finds the cloudflared program, reports its version, and updates it
 // from Cloudflare's official GitHub releases when asked to.
 //
 // Where cloudflared can come from, newest version wins:
-//   - "updated"  : ~/Library/Application Support/StudioWire/cloudflared (written by the updater)
-//   - "bundled"  : /Library/Application Support/StudioWire/cloudflared (installed by the PKG)
+//   - "updated"  : ~/Library/Application Support/StudioRider/cloudflared (written by the updater)
+//   - "bundled"  : /Library/Application Support/StudioRider/cloudflared (installed by the PKG)
 //   - "Homebrew" : /opt/homebrew/bin, /usr/local/bin, … and the PATH
 // A file chosen by hand ("custom") always wins.
 //
@@ -30,8 +30,8 @@ public:
     Cloudflared();
     ~Cloudflared() override;
 
-    static juce::File userDir();      // ~/Library/Application Support/StudioWire
-    static juce::File bundledDir();   // /Library/Application Support/StudioWire
+    static juce::File userDir();      // ~/Library/Application Support/StudioRider
+    static juce::File bundledDir();   // /Library/Application Support/StudioRider
 
     // Chosen by hand in the plugin window (empty = automatic).
     void setOverride (const juce::File& f);

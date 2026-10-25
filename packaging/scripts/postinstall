@@ -1,17 +1,18 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
 # Runs as root after the files are copied.
 # 1. Removes copies of the plugin from the user's own Plug-Ins folder (built with
-#    build.sh, or the former name MixShare): they have the same plugin codes, and
+#    build.sh, or the former names StudioWire and MixShare): they have the same plugin codes, and
 #    the DAW would see the plugin twice.
 # 2. Makes macOS rescan Audio Units, so DAWs see the new version.
 user="$(stat -f %Su /dev/console 2>/dev/null || true)"
 if [[ -n "$user" && "$user" != "root" && "$user" != "loginwindow" ]]; then
     home="$(dscl . -read "/Users/$user" NFSHomeDirectory 2>/dev/null | sed 's/^NFSHomeDirectory: //')"
     if [[ -d "$home/Library/Audio/Plug-Ins" ]]; then
-        for b in Components/StudioWire.component VST3/StudioWire.vst3 Components/MixShare.component VST3/MixShare.vst3; do
+        for b in Components/StudioRider.component VST3/StudioRider.vst3 Components/StudioWire.component VST3/StudioWire.vst3 \
+                 Components/MixShare.component VST3/MixShare.vst3; do
             [[ -e "$home/Library/Audio/Plug-Ins/$b" ]] && rm -rf "$home/Library/Audio/Plug-Ins/$b"
         done
     fi

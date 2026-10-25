@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 // Checks that the stream quality is saved and restored with the project,
 // and that it is applied to the server.
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_events/juce_events.h>
 #include "PluginProcessor.h"
+#include <tuple>
 #include <iostream>
 
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();
@@ -17,43 +18,45 @@ int main()
     int fails = 0;
     auto check = [&] (bool c, const char* m) { std::cout << (c ? "OK   " : "FAIL ") << m << "\n"; if (! c) ++fails; };
 
-    std::unique_ptr<StudioWireProcessor> a (static_cast<StudioWireProcessor*> (createPluginFilter()));
-    check (a->getMaxQuality() == studiowire::Quality::cd, "new instance: stream quality = CD");
+    std::unique_ptr<StudioRiderProcessor> a (static_cast<StudioRiderProcessor*> (createPluginFilter()));
+    check (a->getMaxQuality() == studiorider::Quality::cd, "new instance: stream quality = CD");
     check (a->getParameters().size() == 1, "a single parameter exposed to the DAW");
     std::cout << "     parameter: " << a->getMaxQualityParam().getName (64) << " = " << a->getMaxQualityParam().getCurrentValueAsText() << "\n";
 
     a->getMaxQualityParam().setValueNotifyingHost (a->getMaxQualityParam().convertTo0to1 (2.0f)); // Hi-Res
-    check (a->getMaxQuality() == studiowire::Quality::hires, "set to Hi-Res");
+    check (a->getMaxQuality() == studiorider::Quality::hires, "set to Hi-Res");
 
     juce::MemoryBlock state;
     a->getStateInformation (state);
 
-    std::unique_ptr<StudioWireProcessor> b (static_cast<StudioWireProcessor*> (createPluginFilter()));
+    std::unique_ptr<StudioRiderProcessor> b (static_cast<StudioRiderProcessor*> (createPluginFilter()));
     b->setStateInformation (state.getData(), (int) state.getSize());
-    check (b->getMaxQuality() == studiowire::Quality::hires, "project reopened: Hi-Res restored");
+    check (b->getMaxQuality() == studiorider::Quality::hires, "project reopened: Hi-Res restored");
 
-    // A project saved under the former name (MixShare) still restores its stream quality.
+    // Projects saved under the former names (MixShare, StudioWire) still restore their stream quality.
+    for (auto [name, q, expected] : { std::tuple { "MixShare", "eco", studiorider::Quality::eco },
+                                      std::tuple { "StudioWire", "hires", studiorider::Quality::hires } })
     {
-        juce::ValueTree legacy ("MixShare");
-        legacy.setProperty ("maxQuality", "eco", nullptr);
+        juce::ValueTree legacy (name);
+        legacy.setProperty ("maxQuality", q, nullptr);
         juce::MemoryBlock legacyState;
         juce::MemoryOutputStream out (legacyState, false);
         legacy.writeToStream (out);
         out.flush();
-        std::unique_ptr<StudioWireProcessor> c (static_cast<StudioWireProcessor*> (createPluginFilter()));
+        std::unique_ptr<StudioRiderProcessor> c (static_cast<StudioRiderProcessor*> (createPluginFilter()));
         c->setStateInformation (legacyState.getData(), (int) legacyState.getSize());
-        check (c->getMaxQuality() == studiowire::Quality::eco, "MixShare project: Opus restored");
+        check (c->getMaxQuality() == expected, (juce::String (name) + " project: " + q + " restored").toRawUTF8());
     }
 
     // Applied to the server by the plugin's timer (message thread), then changed while live.
     auto* bp = b.get();
     juce::Timer::callAfterDelay (300, [&, bp]
     {
-        check (bp->getServer().getMaxQuality() == studiowire::Quality::hires, "server set to Hi-Res");
+        check (bp->getServer().getMaxQuality() == studiorider::Quality::hires, "server set to Hi-Res");
         bp->getMaxQualityParam().setValueNotifyingHost (bp->getMaxQualityParam().convertTo0to1 (0.0f)); // Opus
         juce::Timer::callAfterDelay (300, [&, bp]
         {
-            check (bp->getServer().getMaxQuality() == studiowire::Quality::eco, "changed while live: server switched to Opus");
+            check (bp->getServer().getMaxQuality() == studiorider::Quality::eco, "changed while live: server switched to Opus");
             juce::MessageManager::getInstance()->stopDispatchLoop();
         });
     });

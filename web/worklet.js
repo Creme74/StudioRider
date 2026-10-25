@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
-// StudioWire — AudioWorklet player.
+// StudioRider — AudioWorklet player.
 //
 // Receives already-decoded PCM blocks (Float32, left/right), stores them in a
 // ring buffer and plays them as they are: in normal operation every output
@@ -10,7 +10,7 @@
 // a dropout, and a 5 ms crossfade if the buffer has grown too much (clock drift
 // or a network burst) and has to be brought back to the target.
 
-class StudioWirePlayer extends AudioWorkletProcessor {
+class StudioRiderPlayer extends AudioWorkletProcessor {
   constructor(options) {
     super();
     const o = (options && options.processorOptions) || {};
@@ -125,4 +125,4 @@ class StudioWirePlayer extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('studiowire-player', StudioWirePlayer);
+registerProcessor('studiorider-player', StudioRiderPlayer);

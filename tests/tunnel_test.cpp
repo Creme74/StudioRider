@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 //
 // Checks that Tunnel starts the binary, reads its output as it comes,
 // extracts the trycloudflare URL and stops cleanly.

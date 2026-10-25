@@ -1,15 +1,15 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (C) 2026 The StudioWire authors
+# Copyright (C) 2026 The StudioRider authors
 #
-# Makes the StudioWire installer: build/StudioWire-<version>.pkg
+# Makes the StudioRider installer: build/StudioRider-<version>.pkg
 #   - AU + VST3, universal (Apple Silicon + Intel), macOS 13 or later
 #   - cloudflared (latest release from Cloudflare's GitHub, checksums verified,
 #     Apple Silicon + Intel), used for the public link
-#   - licence texts, in /Library/Application Support/StudioWire
-#   - an uninstaller app, in /Applications/StudioWire
+#   - licence texts, in /Library/Application Support/StudioRider
+#   - an uninstaller app, in /Applications/StudioRider
 #
-# Also writes build/StudioWire-<version>-source.tar.gz (the matching source code,
+# Also writes build/StudioRider-<version>-source.tar.gz (the matching source code,
 # to hand out with the installer as the GPL asks).
 #
 # Optional signing (not needed to use the installer, see README):
@@ -20,8 +20,8 @@ cd "$(dirname "$0")"
 source scripts/common.sh
 
 ARCHS="arm64;x86_64"
-PKG_ID="net.studiowire.pkg"
-VERSION="$(studiowire_version)"
+PKG_ID="net.studiorider.pkg"
+VERSION="$(studiorider_version)"
 [[ -n "$VERSION" ]] || die "Could not read the version from CMakeLists.txt."
 
 check_tools
@@ -33,16 +33,16 @@ fetch_dependencies
 # --- 1. The plugin, universal --------------------------------------------------
 CMAKE_DIR=build/universal
 cmake_build "$CMAKE_DIR" "$ARCHS" -DCMAKE_OSX_DEPLOYMENT_TARGET="$MIN_MACOS"
-ART="$CMAKE_DIR/StudioWire_artefacts/Release"
-AU_SRC="$ART/AU/StudioWire.component"
-VST3_SRC="$ART/VST3/StudioWire.vst3"
+ART="$CMAKE_DIR/StudioRider_artefacts/Release"
+AU_SRC="$ART/AU/StudioRider.component"
+VST3_SRC="$ART/VST3/StudioRider.vst3"
 
 say "Checking the binaries"
 minos() { # minos <binary> <arch>: minimum macOS the slice was built for
     otool -arch "$2" -l "$1" | awk '/LC_BUILD_VERSION/ {b=1} /LC_VERSION_MIN_MACOSX/ {v=1}
                                     b && $1=="minos" {print $2; exit} v && $1=="version" {print $2; exit}'
 }
-for bin in "$AU_SRC/Contents/MacOS/StudioWire" "$VST3_SRC/Contents/MacOS/StudioWire"; do
+for bin in "$AU_SRC/Contents/MacOS/StudioRider" "$VST3_SRC/Contents/MacOS/StudioRider"; do
     [[ -f "$bin" ]] || die "Missing build output: $bin"
     info="$(lipo -info "$bin")"
     [[ "$info" == *arm64* && "$info" == *x86_64* ]] || die "Not a universal binary: $info"
@@ -53,8 +53,8 @@ done
 CF=build/cloudflared
 say "Getting cloudflared (latest release, from github.com/cloudflare/cloudflared)"
 mkdir -p "$CF"
-CF_API="${STUDIOWIRE_CLOUDFLARED_API:-https://api.github.com/repos/cloudflare/cloudflared/releases/latest}"  # (tests use a fake one)
-curl -fsSL --retry 3 -H "Accept: application/vnd.github+json" -H "User-Agent: StudioWire" \
+CF_API="${STUDIORIDER_CLOUDFLARED_API:-https://api.github.com/repos/cloudflare/cloudflared/releases/latest}"  # (tests use a fake one)
+curl -fsSL --retry 3 -H "Accept: application/vnd.github+json" -H "User-Agent: StudioRider" \
      -o "$CF/release.json" "$CF_API" \
     || die "Could not reach GitHub to get cloudflared."
 # Prints: <tag>, then "<asset> <url> <notes checksum or -> <GitHub digest or ->" per architecture.
@@ -112,31 +112,31 @@ if "$CF/cloudflared" --version >/dev/null 2>&1; then
     echo "Runs on this Mac: $("$CF/cloudflared" --version 2>&1 | head -1)"
 else
     printf "\033[1;33mWarning:\033[0m this cloudflared doesn't run on this Mac (macOS %s).\n" "$MACOS"
-    echo "      The installer is still made. On this Mac, StudioWire will use Homebrew's cloudflared if there is one."
+    echo "      The installer is still made. On this Mac, StudioRider will use Homebrew's cloudflared if there is one."
 fi
 
 # --- 3. Files to install ---------------------------------------------------------
 say "Preparing the installer contents"
 ROOT=build/pkgroot
-SUPPORT="$ROOT/Library/Application Support/StudioWire"
-UNINSTALLER="$ROOT/Applications/StudioWire/Uninstall StudioWire.app"
+SUPPORT="$ROOT/Library/Application Support/StudioRider"
+UNINSTALLER="$ROOT/Applications/StudioRider/Uninstall StudioRider.app"
 rm -rf "$ROOT" build/pkgparts
 mkdir -p "$ROOT/Library/Audio/Plug-Ins/Components" "$ROOT/Library/Audio/Plug-Ins/VST3" "$SUPPORT/Licenses" \
          "$(dirname "$UNINSTALLER")" build/pkgparts
-ditto --norsrc --noextattr "$AU_SRC"   "$ROOT/Library/Audio/Plug-Ins/Components/StudioWire.component"
-ditto --norsrc --noextattr "$VST3_SRC" "$ROOT/Library/Audio/Plug-Ins/VST3/StudioWire.vst3"
+ditto --norsrc --noextattr "$AU_SRC"   "$ROOT/Library/Audio/Plug-Ins/Components/StudioRider.component"
+ditto --norsrc --noextattr "$VST3_SRC" "$ROOT/Library/Audio/Plug-Ins/VST3/StudioRider.vst3"
 install -m 755 "$CF/cloudflared" "$SUPPORT/cloudflared"
 
 # The uninstaller: a small AppleScript app (asks for the password with the usual macOS dialog).
-osacompile -o "$UNINSTALLER" "packaging/uninstaller/Uninstall StudioWire.applescript" \
+osacompile -o "$UNINSTALLER" "packaging/uninstaller/Uninstall StudioRider.applescript" \
     || die "Could not make the uninstaller (osacompile)."
 install -m 755 packaging/uninstaller/uninstall.sh "$UNINSTALLER/Contents/Resources/uninstall.sh"
-plutil -replace CFBundleIdentifier -string net.studiowire.uninstaller "$UNINSTALLER/Contents/Info.plist"
+plutil -replace CFBundleIdentifier -string net.studiorider.uninstaller "$UNINSTALLER/Contents/Info.plist"
 plutil -replace CFBundleShortVersionString -string "$VERSION" "$UNINSTALLER/Contents/Info.plist"
 plutil -replace LSMinimumSystemVersion -string "$MIN_MACOS" "$UNINSTALLER/Contents/Info.plist"
 
 L="$SUPPORT/Licenses"
-cp LICENSE                                   "$L/StudioWire (GPL-3.0).txt"
+cp LICENSE                                   "$L/StudioRider (GPL-3.0).txt"
 cp THIRD_PARTY_NOTICES.md                    "$L/THIRD_PARTY_NOTICES.md"
 cp packaging/licenses/cloudflared-LICENSE.txt "$L/cloudflared (Apache-2.0).txt"
 cp packaging/licenses/wasm-audio-decoders-LICENSE.txt "$L/wasm-audio-decoders (MIT).txt"
@@ -154,15 +154,15 @@ xattr -cr "$ROOT" 2>/dev/null || true
 
 say "Signing"
 if [[ -n "${SIGN_APP:-}" ]]; then
-    for b in "$ROOT/Library/Audio/Plug-Ins/Components/StudioWire.component" "$ROOT/Library/Audio/Plug-Ins/VST3/StudioWire.vst3" "$UNINSTALLER"; do
+    for b in "$ROOT/Library/Audio/Plug-Ins/Components/StudioRider.component" "$ROOT/Library/Audio/Plug-Ins/VST3/StudioRider.vst3" "$UNINSTALLER"; do
         codesign --force --timestamp --options runtime --sign "$SIGN_APP" "$b"
     done
     codesign -dv "$SUPPORT/cloudflared" 2>&1 | grep -q "TeamIdentifier=not set" \
         && codesign --force --timestamp --options runtime --sign "$SIGN_APP" "$SUPPORT/cloudflared"
     echo "Signed with: $SIGN_APP"
 else
-    codesign --force --deep --sign - "$ROOT/Library/Audio/Plug-Ins/Components/StudioWire.component"
-    codesign --force --deep --sign - "$ROOT/Library/Audio/Plug-Ins/VST3/StudioWire.vst3"
+    codesign --force --deep --sign - "$ROOT/Library/Audio/Plug-Ins/Components/StudioRider.component"
+    codesign --force --deep --sign - "$ROOT/Library/Audio/Plug-Ins/VST3/StudioRider.vst3"
     codesign --force --deep --sign - "$UNINSTALLER"
     echo "Signed locally (ad hoc). The installer is not signed: see README, \"Installing\"."
 fi
@@ -190,7 +190,7 @@ pkgbuild --root "$ROOT" \
          --identifier "$PKG_ID" \
          --version "$VERSION" \
          --install-location / \
-         build/pkgparts/StudioWire.pkg >/dev/null
+         build/pkgparts/StudioRider.pkg >/dev/null
 
 sed -e "s/@VERSION@/$VERSION/g" -e "s/@MIN_MACOS@/$MIN_MACOS/g" -e "s/@PKG_ID@/$PKG_ID/g" \
     packaging/Distribution.xml > build/pkgparts/Distribution.xml
@@ -199,7 +199,7 @@ for f in packaging/resources/*.html; do
     sed -e "s/@VERSION@/$VERSION/g" -e "s/@CLOUDFLARED@/$CF_VERSION/g" "$f" > "build/pkgparts/resources/$(basename "$f")"
 done
 
-PKG="build/StudioWire-$VERSION.pkg"
+PKG="build/StudioRider-$VERSION.pkg"
 rm -f "$PKG"
 if [[ -n "${SIGN_INSTALLER:-}" ]]; then
     productbuild --distribution build/pkgparts/Distribution.xml --resources build/pkgparts/resources \
@@ -215,11 +215,11 @@ if [[ -n "${NOTARY_PROFILE:-}" ]]; then
 fi
 
 # --- 5. Matching source code -----------------------------------------------------
-SRC="build/StudioWire-$VERSION-source.tar.gz"
+SRC="build/StudioRider-$VERSION-source.tar.gz"
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1 && [[ -z "$(git status --porcelain 2>/dev/null)" ]]; then
-    git archive --format=tar.gz --prefix="StudioWire-$VERSION/" -o "$SRC" HEAD
+    git archive --format=tar.gz --prefix="StudioRider-$VERSION/" -o "$SRC" HEAD
 else
-    COPYFILE_DISABLE=1 tar -czf "$SRC" -s ",^\.,StudioWire-$VERSION," \
+    COPYFILE_DISABLE=1 tar -czf "$SRC" -s ",^\.,StudioRider-$VERSION," \
         --exclude ./build --exclude './build-*' --exclude ./JUCE --exclude ./third_party \
         --exclude ./.tools --exclude ./.git --exclude .DS_Store --exclude '*.pkg' .
 fi
@@ -227,5 +227,5 @@ fi
 say "Done"
 echo "Installer:   $PKG ($(du -h "$PKG" | cut -f1 | tr -d ' '))"
 echo "Source code: $SRC"
-echo "Installs StudioWire $VERSION (AU + VST3, Apple Silicon + Intel, macOS $MIN_MACOS+) and cloudflared $CF_VERSION."
+echo "Installs StudioRider $VERSION (AU + VST3, Apple Silicon + Intel, macOS $MIN_MACOS+) and cloudflared $CF_VERSION."
 pkgutil --check-signature "$PKG" 2>/dev/null | sed -n 2p || true

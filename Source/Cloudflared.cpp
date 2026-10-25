@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Copyright (C) 2026 The StudioWire authors
+// Copyright (C) 2026 The StudioRider authors
 #include "Cloudflared.h"
 
 #include <juce_cryptography/juce_cryptography.h>
@@ -17,7 +17,7 @@ namespace
 
     juce::String releaseApiUrl()
     {
-        return env ("STUDIOWIRE_CLOUDFLARED_API", "https://api.github.com/repos/cloudflare/cloudflared/releases/latest");
+        return env ("STUDIORIDER_CLOUDFLARED_API", "https://api.github.com/repos/cloudflare/cloudflared/releases/latest");
     }
 
     // Name of the release file for this computer.
@@ -67,7 +67,7 @@ namespace
     std::unique_ptr<juce::InputStream> openUrl (const juce::String& address, int timeoutMs, int* status)
     {
         const auto opts = juce::URL::InputStreamOptions (juce::URL::ParameterHandling::inAddress)
-                              .withExtraHeaders ("Accept: application/vnd.github+json\r\nUser-Agent: StudioWire")
+                              .withExtraHeaders ("Accept: application/vnd.github+json\r\nUser-Agent: StudioRider")
                               .withConnectionTimeoutMs (timeoutMs)
                               .withNumRedirectsToFollow (10)
                               .withStatusCode (status);
@@ -88,9 +88,9 @@ namespace
 }
 
 //==============================================================================
-Cloudflared::Cloudflared() : juce::Thread ("StudioWire cloudflared")
+Cloudflared::Cloudflared() : juce::Thread ("StudioRider cloudflared")
 {
-    assetName = env ("STUDIOWIRE_CLOUDFLARED_ASSET", defaultAssetName());
+    assetName = env ("STUDIORIDER_CLOUDFLARED_ASSET", defaultAssetName());
     startThread();   // waits for jobs for the whole lifetime of the plugin
     rescan();
 }
@@ -104,21 +104,21 @@ Cloudflared::~Cloudflared()
 
 juce::File Cloudflared::userDir()
 {
-    const auto custom = juce::SystemStats::getEnvironmentVariable ("STUDIOWIRE_SUPPORT_DIR", {});
+    const auto custom = juce::SystemStats::getEnvironmentVariable ("STUDIORIDER_SUPPORT_DIR", {});
     if (custom.isNotEmpty())
         return juce::File (custom);
-    return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("StudioWire");
+    return juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory).getChildFile ("StudioRider");
 }
 
 juce::File Cloudflared::bundledDir()
 {
-    const auto custom = juce::SystemStats::getEnvironmentVariable ("STUDIOWIRE_BUNDLED_DIR", {});
+    const auto custom = juce::SystemStats::getEnvironmentVariable ("STUDIORIDER_BUNDLED_DIR", {});
     if (custom.isNotEmpty())
         return juce::File (custom);
    #if JUCE_MAC
-    return juce::File ("/Library/Application Support/StudioWire");
+    return juce::File ("/Library/Application Support/StudioRider");
    #else
-    return juce::File::getSpecialLocation (juce::File::commonApplicationDataDirectory).getChildFile ("StudioWire");
+    return juce::File::getSpecialLocation (juce::File::commonApplicationDataDirectory).getChildFile ("StudioRider");
    #endif
 }
 
@@ -282,6 +282,9 @@ void Cloudflared::doScan()
         struct Candidate { juce::File file; const char* source; };
         juce::Array<Candidate> candidates;
         candidates.add ({ userDir().getChildFile (exeName()), "updated" });
+        if (juce::SystemStats::getEnvironmentVariable ("STUDIORIDER_SUPPORT_DIR", {}).isEmpty())   // update made under the former name
+            candidates.add ({ juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory)
+                                  .getChildFile ("StudioWire").getChildFile (exeName()), "updated" });
         candidates.add ({ bundledDir().getChildFile (exeName()), "bundled" });
 
         const auto home = juce::File::getSpecialLocation (juce::File::userHomeDirectory);
