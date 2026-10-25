@@ -30,8 +30,8 @@ DAW (Masterbus) ─► StudioRider ─► local server ─► cloudflare ─► 
 
 ## Installing
 
-Download the latest `StudioRider-<version>.pkg` from the
-**[Releases](https://github.com/Creme74/StudioRider/releases/latest)** page and open it. It installs, for all users:
+Download **[StudioRider-1.0.pkg](https://github.com/Creme74/StudioRider/releases/download/v1.0/StudioRider-1.0.pkg)**
+and open it (older versions: **[Releases](https://github.com/Creme74/StudioRider/releases)**). It installs, for all users:
 
 | What | Where |
 |---|---|
