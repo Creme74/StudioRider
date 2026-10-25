@@ -11,7 +11,7 @@ page and the stream itself, and a Cloudflare Quick Tunnel makes it reachable
 from the Internet.
 
 ```
-DAW (master) ─► StudioRider ─► local server 127.0.0.1 ─► cloudflared ─► https://….trycloudflare.com ─► browser
+DAW (Masterbus) ─► StudioRider ─► local server ─► cloudflare ─► Browser
 ```
 
 <p align="center">
